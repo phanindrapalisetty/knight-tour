@@ -1,0 +1,4 @@
+fastapi
+uvicorn
+jinja2
+aiofiles  # If you're serving static files

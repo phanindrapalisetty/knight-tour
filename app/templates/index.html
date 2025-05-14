@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Knight's Tour</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #eee;
+      font-family: sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      box-sizing: border-box;
+    }
+
+    .container {
+      display: flex;
+      gap: 40px;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    .left-block {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    h2 {
+      margin: 0;
+    }
+
+    .board-wrapper {
+      position: relative;
+    }
+
+    .axis-labels {
+      position: absolute;
+      font-size: 14px;
+      color: #333;
+    }
+
+    .rank {
+      left: -18px;
+      top: 0;
+      display: grid;
+      grid-template-rows: repeat(8, 60px);
+      height: 480px;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .file {
+      top: 490px;
+      left: 0;
+      width: 480px;
+      display: grid;
+      grid-template-columns: repeat(8, 60px);
+      justify-items: center;
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(8, 60px);
+      grid-template-rows: repeat(8, 60px);
+      border: 3px solid #333;
+    }
+
+    .cell {
+      width: 60px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .white { background-color: #fff; } 
+    .black { background-color: #3591ca; }
+
+    /* #f0d9b5 #b58863 */
+
+    .dot {
+      font-size: 100px;
+      color: #46CA35;
+      position: absolute;
+      line-height: 0;
+    }
+
+    .cross {
+      font-size: 50px;
+      color: rgb(207, 115, 115);
+      position: absolute;
+    }
+
+    .knight {
+      font-size: 75px;
+      color: rgb(61, 61, 61);
+      z-index: 1;
+    }
+
+    .right-block {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 20px;
+      padding: 10px;
+    }
+
+    .score {
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .move-history {
+      margin-top: 20px;
+      font-size: 14px;
+      max-width: 480px;
+      font-weight: bold;
+      word-wrap: break-word;
+    }
+
+    button {
+      padding: 8px 16px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="left-block">
+      <h2>Knight's Tour</h2>
+      <div class="board-wrapper">
+        <div class="axis-labels rank">
+          <div>8</div><div>7</div><div>6</div><div>5</div><div>4</div><div>3</div><div>2</div><div>1</div>
+        </div>
+        <div id="board" class="board"></div>
+        <div class="axis-labels file">
+          <div>a</div><div>b</div><div>c</div><div>d</div><div>e</div><div>f</div><div>g</div><div>h</div>
+        </div>
+      </div>
+      <div class="move-history" id="moveHistory"></div>
+      <!-- <button onclick="downloadHistory()">⬇️ Download Moves</button> -->
+    </div>
+
+    <div class="right-block">
+        <button onclick="randomStart()">🎲 Random Start</button>
+        <button onclick="resetGame()">🔄 Restart</button>
+        <button onclick="downloadHistory()">⬇️ Moves</button>
+        <div class="score" id="score">Score: 0</div>
+    </div>
+  </div>
+
+  <script>
+    let board = [], knight = null, legalMoves = [], score = 0;
+    let moveList = [];
+
+    function coordToNotation(x, y) {
+      const files = "abcdefgh";
+      return `${files[x]}${8 - y}`;
+    }
+
+    function drawBoard() {
+      const boardEl = document.getElementById("board");
+      boardEl.innerHTML = "";
+
+      for (let y = 0; y < 8; y++) {
+        for (let x = 0; x < 8; x++) {
+          const cell = document.createElement("div");
+          cell.className = "cell " + ((x + y) % 2 === 0 ? "white" : "black");
+
+          const content = document.createElement("div");
+
+          if (knight && knight[0] === x && knight[1] === y) {
+            content.innerText = "♞";
+            content.className = "knight";
+          } else if (legalMoves.some(m => m[0] === x && m[1] === y)) {
+            content.innerText = "•";
+            content.className = "dot";
+          } else if (board[y][x] !== -1) {
+            content.innerText = "✕";
+            content.className = "cross";
+          }
+
+          cell.appendChild(content);
+          cell.onclick = () => handleClick(x, y);
+          boardEl.appendChild(cell);
+        }
+      }
+
+      document.getElementById("score").innerText = `Score: ${score}`;
+      document.getElementById("moveHistory").innerText = "Moves: " + moveList.join(" → ");
+    }
+
+    async function handleClick(x, y) {
+      if (!knight) {
+        const res = await fetch("/start?x=" + x + "&y=" + y, { method: "POST" });
+        const data = await res.json();
+        board = data.board;
+        knight = data.knight_pos;
+        legalMoves = data.legal_moves;
+        score = 1;
+        moveList = [coordToNotation(x, y)];
+        drawBoard();
+      } else if (legalMoves.some(m => m[0] === x && m[1] === y)) {
+        const res = await fetch("/move?x=" + x + "&y=" + y, { method: "POST" });
+        const data = await res.json();
+        board = data.board;
+        knight = data.knight_pos;
+        legalMoves = data.legal_moves;
+        moveList.push(coordToNotation(x, y));
+
+        score = board.flat().filter(v => v !== -1).length;
+        drawBoard();
+
+        if (score === 64) {
+          setTimeout(() => alert(`🎉 Congratulations! You completed the Knight's Tour with score: ${score}`), 100);
+        } else if (legalMoves.length === 0) {
+          setTimeout(() => alert(`🚫 Game Over! No more legal moves.\nYour score: ${score}`), 100);
+        }
+      }
+    }
+
+    async function resetGame() {
+      board = Array(8).fill().map(() => Array(8).fill(-1));
+      knight = null;
+      legalMoves = [];
+      score = 0;
+      moveList = [];
+      drawBoard();
+    }
+
+    async function randomStart() {
+        if (knight) return;
+
+        let x = Math.floor(Math.random() * 8);
+        let y = Math.floor(Math.random() * 8);
+
+        const res = await fetch("/start?x=" + x + "&y=" + y, { method: "POST" });
+        const data = await res.json();
+        board = data.board;
+        knight = data.knight_pos;
+        legalMoves = data.legal_moves;
+        score = 1;
+        moveList = [coordToNotation(x, y)];
+        drawBoard();
+    }
+
+    function downloadHistory() {
+      const blob = new Blob([moveList.join(" → ")], { type: 'text/plain' });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "knight_moves.txt";
+      link.click();
+    }
+
+    window.onload = resetGame;
+  </script>
+</body>
+</html>
