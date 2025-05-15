@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from app.game_logic import get_legal_moves
@@ -17,6 +17,14 @@ move_count = 0
 @app.get("/", response_class=HTMLResponse)
 def home(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
+
+@app.get("/manifest.json")
+async def manifest():
+    return FileResponse("app/manifest.json", media_type="application/json")
+
+@app.get("/sw.js")
+async def service_worker():
+    return FileResponse("app/sw.js", media_type="application/javascript")
 
 @app.post("/start")
 def start_game(x: int, y: int):

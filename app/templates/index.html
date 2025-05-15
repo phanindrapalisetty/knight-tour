@@ -1,6 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#3591ca">
+  <script>
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/sw.js");
+    }
+  </script>
   <title>Knight's Tour</title>
   <style>
     body {
@@ -79,6 +86,10 @@
       justify-content: center;
       cursor: pointer;
       position: relative;
+    }
+
+    .cell:active {
+      outline: 2px solid orange;
     }
 
     .white { background-color: #fff; } 
@@ -200,6 +211,8 @@
     }
 
     async function handleClick(x, y) {
+      let sessionStartTime = null;
+      let sessionEndTime = null;
       if (!knight) {
         const res = await fetch("/start?x=" + x + "&y=" + y, { method: "POST" });
         const data = await res.json();
@@ -225,10 +238,16 @@
         } else if (legalMoves.length === 0) {
           setTimeout(() => alert(`🚫 Game Over! No more legal moves.\nYour score: ${score}`), 100);
         }
+
+        sessionEndTime = new Date();
+        console.log("Session Duration:", (sessionEndTime - sessionStartTime) / 1000, "seconds");
       }
     }
 
     async function resetGame() {
+      let sessionStartTime = null;
+      let sessionEndTime = null;
+      sessionStartTime = new Date();
       board = Array(8).fill().map(() => Array(8).fill(-1));
       knight = null;
       legalMoves = [];
@@ -238,19 +257,20 @@
     }
 
     async function randomStart() {
-        if (knight) return;
+      sessionStartTime = new Date();
+      if (knight) return;
 
-        let x = Math.floor(Math.random() * 8);
-        let y = Math.floor(Math.random() * 8);
+      let x = Math.floor(Math.random() * 8);
+      let y = Math.floor(Math.random() * 8);
 
-        const res = await fetch("/start?x=" + x + "&y=" + y, { method: "POST" });
-        const data = await res.json();
-        board = data.board;
-        knight = data.knight_pos;
-        legalMoves = data.legal_moves;
-        score = 1;
-        moveList = [coordToNotation(x, y)];
-        drawBoard();
+      const res = await fetch("/start?x=" + x + "&y=" + y, { method: "POST" });
+      const data = await res.json();
+      board = data.board;
+      knight = data.knight_pos;
+      legalMoves = data.legal_moves;
+      score = 1;
+      moveList = [coordToNotation(x, y)];
+      drawBoard();
     }
 
     function downloadHistory() {
