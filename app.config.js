@@ -8,7 +8,7 @@ export default {
   description: "Move a knight to every square of the board exactly once.",
   // The classic puzzle's name, used as the mode title on Home, Play and Result. Separate from
   // `name` so renaming the app doesn't rename the puzzle (a Daily puzzle mode will sit beside it).
-  tourModeName: "Knight Zigg",
+  tourModeName: "Knight's Tour",
   themeColor: "#F2F4EE",      // browser/status bar before the app's own theme loads (Tournament ground)
   backgroundColor: "#F2F4EE", // splash screen while the installed app starts
 };
