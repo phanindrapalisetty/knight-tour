@@ -1,5 +1,6 @@
-import { getTotal, toNotation } from "../game.js";
+import { getScore, getStatus, getTotal, toNotation } from "../game.js";
 import { displayedStreak } from "../streak.js";
+import { sizeStats } from "../stats.js";
 import { formatTime, plural } from "../format.js";
 import { boardLabels } from "./play.js";
 import { FEATURES } from "../features.js";
@@ -12,21 +13,32 @@ function streakLine(streak) {
   return gap > 0 ? `${plural(gap, "day")} to beat your best.` : "That's your best streak yet.";
 }
 
+// Shown for any finished game: a full tour, or one that got stuck part-way.
 export function renderResult(state) {
-  const { session, streak } = state;
+  const { session, streak, stats } = state;
   const { game } = session;
   const total = getTotal(game);
-  const first = game.moves[0];
-  const last = game.moves.at(-1);
+  const visited = getScore(game);
+  const won = getStatus(game) === "won";
+  const first = toNotation(...game.moves[0], game.size);
+  const last = toNotation(...game.moves.at(-1), game.size);
+  const best = sizeStats(stats, game.size).bestScore;
   const { ranks, files } = boardLabels(game.size);
 
   const cells = [];
   for (let y = 0; y < game.size; y++) {
     for (let x = 0; x < game.size; x++) {
-      const end = (x === first[0] && y === first[1]) || (x === last[0] && y === last[1]);
-      cells.push(`<span class="cell ${end ? "sq-current" : (x + y) % 2 ? "sq-dark" : "sq-light"}">${icon.cross("55%")}</span>`);
+      const order = game.board[y][x];
+      const end = order === 0 || order === visited - 1;
+      const shade = end ? "sq-current" : (x + y) % 2 ? "sq-dark" : "sq-light";
+      cells.push(`<span class="cell ${shade}">${order === -1 ? "" : icon.cross("55%")}</span>`);
     }
   }
+
+  const summary = won
+    ? `Your knight visited every square once, from ${first} to ${last}.`
+    : `Your knight visited ${visited} of ${total} squares, from ${first} to ${last}. `
+      + (visited >= best ? `That's your best on ${game.size}×${game.size}.` : `Your best on ${game.size}×${game.size} is ${best}.`);
 
   return `
     <div class="screen result" style="--n:${game.size}">
@@ -41,15 +53,15 @@ export function renderResult(state) {
 
       <div class="board-area">
         <div class="ranks mono" aria-hidden="true">${ranks}</div>
-        <div class="board" role="img" aria-label="Completed board, every square crossed off">${cells.join("")}</div>
+        <div class="board" role="img" aria-label="${won ? "Completed board, every square crossed off" : `Final board, ${visited} of ${total} squares crossed off`}">${cells.join("")}</div>
         <div class="files mono" aria-hidden="true">${files}</div>
       </div>
 
       <section class="sheet" aria-label="Result">
         <div class="sheet-head">
-          <span class="eyebrow">${total} / ${total} squares</span>
-          <h1>Tour complete</h1>
-          <p class="muted">Your knight visited every square once, from ${toNotation(...first, game.size)} to ${toNotation(...last, game.size)}.</p>
+          <span class="eyebrow">${visited} / ${total} squares</span>
+          <h1>${won ? "Tour complete" : "No moves left"}</h1>
+          <p class="muted">${summary}</p>
         </div>
         <dl class="tiles tiles-auto">
           <div class="tile"><dt>Time</dt><dd>${formatTime(session.elapsed)}</dd></div>

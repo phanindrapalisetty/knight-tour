@@ -83,8 +83,11 @@ export function renderPlay(state, hint) {
 
       ${status === "stuck" ? `
         <div class="banner banner-stuck" role="status">
-          <b>No moves left from ${cur}</b>
-          <span class="muted small">You covered ${count} of ${total} squares. Undo a few moves or restart.</span>
+          <div class="banner-text">
+            <b>No moves left from ${cur}</b>
+            <span class="muted small">You covered ${count} of ${total} squares. Undo a few moves, restart, or share it.</span>
+          </div>
+          <button class="btn btn-ink" data-action="showResult">See result</button>
         </div>` : ""}
       ${status === "won" ? `
         <button class="banner banner-won" data-action="showResult" role="status">

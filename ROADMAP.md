@@ -10,6 +10,8 @@ Legend: `[x]` done · `[ ]` to do · `[~]` built but switched off or partial
 
 | Version | Branch | Highlights | Notes |
 |---|---|---|---|
+| v0.5.0 | `release/v0.5.0` | Result and share for any finished game, not just full tours | [v0.5.0](release-notes/v0.5.0.md) |
+| v0.4.1 | `release/v0.4.1` | Home section heading reads "Knight's Tour" | [v0.4.1](release-notes/v0.4.1.md) |
 | v0.4.0 | `release/v0.4.0` | PWA: offline play, update prompt, install screenshots | [v0.4.0](release-notes/v0.4.0.md) |
 | v0.3.0 | `release/v0.3.0` | CI/CD: tests on every push, release checks, GitHub Releases, GitHub Pages deploy | [v0.3.0](release-notes/v0.3.0.md) |
 | v0.2.0 | `release/v0.2.0` | Board theme and appearance moved into a ☰ menu | [v0.2.0](release-notes/v0.2.0.md) |
@@ -60,6 +62,7 @@ CD
 - [x] Day streak with a Monday–Sunday week view
 - [x] Lifetime stats per size on Home: best score, best time, games played, tours completed
 - [x] Result screen and share card (copy text, share or download an image)
+- [x] Result and share for any finished game, including stuck ones (v0.5.0)
 - [x] Five board themes, each with a light and dark palette
 - [x] Appearance setting: System, Light, Dark (contrast checked by tests)
 - [x] Saved game resumes after closing; old save formats upgrade automatically

@@ -740,7 +740,19 @@ button.cell:disabled { cursor: default; }
 .banner-stuck {
   background: var(--surface);
   border: 2px solid var(--flame);
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
 }
+
+.banner-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.banner-stuck .btn { flex-shrink: 0; }
 
 .banner-won {
   background: var(--accent);
@@ -953,7 +965,6 @@ button.cell:disabled { cursor: default; }
   color: #F2F4EE;
 }
 
-.share-stats .flame-text { color: #FF9A3D; }
 
 .share-message {
   display: flex;

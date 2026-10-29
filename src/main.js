@@ -47,8 +47,9 @@ const SCREENS = {
 function currentScreen() {
   const name = location.hash.replace(/^#\/?/, "") || "home";
   if (!(name in SCREENS)) return "home";
-  // Result and share only make sense for a finished tour.
-  if ((name === "result" || name === "share") && getStatus(state.session.game) !== "won") return "home";
+  // Result and share only make sense once the game is over: a full tour, or stuck part-way.
+  const over = ["won", "stuck"].includes(getStatus(state.session.game));
+  if ((name === "result" || name === "share") && !over) return "home";
   return name;
 }
 

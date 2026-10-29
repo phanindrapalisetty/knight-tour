@@ -1,4 +1,4 @@
-import { getTotal } from "../game.js";
+import { getScore, getTotal } from "../game.js";
 import { displayedStreak } from "../streak.js";
 import { formatTime, plural } from "../format.js";
 import { sizeName } from "./home.js";
@@ -10,26 +10,47 @@ import app from "../../app.config.js";
 export const appSlug = app.name.toLowerCase().replace(/['’]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
 // The card is always dark, whatever the app theme, like the design.
-const CARD = { bg: "#18211A", ink: "#F2F4EE", muted: "#B9C4BA", rule: "#34433A", chip: "#2F5D3A", flame: "#FF9A3D" };
+const CARD = { bg: "#18211A", ink: "#F2F4EE", muted: "#B9C4BA", rule: "#34433A", chip: "#2F5D3A", flame: "#FF9A3D", unvisited: "#2A352D" };
 const HEAT = ["#CFEBD5", "#9ED8AC", "#5FBF7C", "#1FA352"];   // first moves → last moves
 
+// Works for any finished game: a full tour, or one that got stuck part-way.
 export function shareData(state, date = new Date()) {
   const { game, elapsed, hintsUsed } = state.session;
   const total = getTotal(game);
-  const heat = game.board.flat().map(order => HEAT[Math.min(3, Math.floor(order / total * 4))]);
+  const visited = getScore(game);
+  const won = visited === total;
+  // Visited squares shade from first move to last; squares never reached stay dark.
+  const heat = game.board.flat().map(order =>
+    order === -1 ? CARD.unvisited : HEAT[Math.min(3, Math.floor(order / visited * 4))]);
   const streak = displayedStreak(state.streak);
   const time = formatTime(elapsed);
+  const hints = FEATURES.hints ? ` with ${plural(hintsUsed, "hint")}` : "";
   const day = date.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" });
   return {
     size: game.size,
+    won,
+    visited,
+    total,
     heat,
     time,
     hints: hintsUsed,
     streak,
     chip: sizeName(game.size),
     date: day.replace(",", ""),
-    text: `${app.name} · ${sizeName(game.size)}\nCompleted in ${time}${FEATURES.hints ? ` with ${plural(hintsUsed, "hint")}` : ""}. ${streak} day streak.`,
+    text: `${app.name} · ${sizeName(game.size)}\n`
+      + (won ? `Completed all ${total} squares in ${time}${hints}.` : `Visited ${visited} of ${total} squares in ${time}${hints}.`)
+      + ` ${streak} day streak.`,
   };
+}
+
+// The stats row under the board, shared by the on-screen card and the image.
+function cardStats(d) {
+  return [
+    [`${d.visited}/${d.total}`, "squares", CARD.ink],
+    [d.time, "time", CARD.ink],
+    FEATURES.hints && [String(d.hints), d.hints === 1 ? "hint" : "hints", CARD.ink],
+    [String(d.streak), "day streak", CARD.flame],
+  ].filter(Boolean);
 }
 
 export function renderShare(state) {
@@ -54,9 +75,8 @@ export function renderShare(state) {
         <div class="heatmap" style="--n:${d.size}" aria-hidden="true">${cells}</div>
         <div class="heat-legend"><span>First move</span><span class="heat-ramp"></span><span>Last move</span></div>
         <div class="share-stats">
-          <div><span class="mono">${d.time}</span><span>time</span></div>
-          ${FEATURES.hints ? `<div><span class="mono">${d.hints}</span><span>${d.hints === 1 ? "hint" : "hints"}</span></div>` : ""}
-          <div><span class="mono flame-text">${d.streak}</span><span>day streak</span></div>
+          ${cardStats(d).map(([value, label, color]) =>
+            `<div><span class="mono" style="color:${color}">${value}</span><span>${label}</span></div>`).join("")}
         </div>
       </figure>
 
@@ -136,11 +156,7 @@ export async function drawShareCard(d) {
   ctx.fillStyle = CARD.rule;
   ctx.fillRect(pad, y, W - 2 * pad, 1);
 
-  const stats = [
-    [d.time, "time", CARD.ink],
-    FEATURES.hints && [String(d.hints), d.hints === 1 ? "hint" : "hints", CARD.ink],
-    [String(d.streak), "day streak", CARD.flame],
-  ].filter(Boolean);
+  const stats = cardStats(d);
   const colW = (W - 2 * pad) / stats.length;
   stats.forEach(([value, label, color], i) => {
       ctx.fillStyle = color;
