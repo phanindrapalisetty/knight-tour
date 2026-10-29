@@ -10,6 +10,7 @@ Legend: `[x]` done · `[ ]` to do · `[~]` built but switched off or partial
 
 | Version | Branch | Highlights | Notes |
 |---|---|---|---|
+| v0.4.0 | `release/v0.4.0` | PWA: offline play, update prompt, install screenshots | [v0.4.0](release-notes/v0.4.0.md) |
 | v0.3.0 | `release/v0.3.0` | CI/CD: tests on every push, release checks, GitHub Releases, GitHub Pages deploy | [v0.3.0](release-notes/v0.3.0.md) |
 | v0.2.0 | `release/v0.2.0` | Board theme and appearance moved into a ☰ menu | [v0.2.0](release-notes/v0.2.0.md) |
 | v0.1.0 | `release/v0.1.0` | Client-only rebuild with the new design | [v0.1.0](release-notes/v0.1.0.md) |
@@ -94,18 +95,15 @@ Release
 
 ## Phase 4: PWA
 
-Done
 - [x] Manifest generated from `app.config.js`: name, description, colors, standalone display
 - [x] Icons: 192 and 512 PNG, maskable 512, SVG, Apple touch icon
 - [x] Theme color, viewport and safe areas for notched phones
-- [x] Service worker registered in production builds (installable in Chrome and Edge)
-
-To do
-- [ ] Offline play: replace the placeholder `public/sw.js` with `vite-plugin-pwa` (Workbox) precaching the build and fonts
-- [ ] Update flow: "New version available" prompt that reloads into the new version
-- [ ] Manifest `id` and install screenshots (richer install dialog on Android)
-- [ ] Verify offline in DevTools and pass the installability checks
 - [x] Deploy over HTTPS to GitHub Pages on each `v*` tag: https://phanindrapalisetty.github.io/knight-tour/ (v0.3.0)
+- [x] Offline play: `vite-plugin-pwa` (Workbox) precaches the whole build, fonts included; replaces the placeholder `public/sw.js` (v0.4.0)
+- [x] Update flow: "A new version is available" prompt; Reload saves the game, then switches to the new version (v0.4.0)
+- [x] Manifest `id` and install screenshots for the richer install dialog (v0.4.0)
+- [x] Verified: offline reload keeps the game, update prompt works, no installability errors in Chrome (v0.4.0)
+- [ ] Try installing on a real Android phone and iPhone from the live site
 
 ## Phase 5: iOS app
 

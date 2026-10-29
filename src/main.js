@@ -10,6 +10,8 @@ import { defaultSettings } from "./settings.js";
 import { applyTheme, onSystemModeChange } from "./theme.js";
 import { formatTime } from "./format.js";
 import { FEATURES } from "./features.js";
+import { Capacitor } from "@capacitor/core";
+import { setupServiceWorker } from "./pwa.js";
 import { loadAll, saveSession, saveSettings, saveStats, saveStreak } from "./storage.js";
 import { renderHome } from "./screens/home.js";
 import { renderPlay } from "./screens/play.js";
@@ -298,6 +300,7 @@ try {
 applySettingsTheme();
 render();
 
-if (import.meta.env.PROD && "serviceWorker" in navigator) {
-  navigator.serviceWorker.register(`${import.meta.env.BASE_URL}sw.js`);
+// Offline support and update prompts on the web. The native apps bundle their files already.
+if (import.meta.env.PROD && "serviceWorker" in navigator && !Capacitor.isNativePlatform()) {
+  setupServiceWorker({ beforeReload: () => saveSession(state.session) });
 }

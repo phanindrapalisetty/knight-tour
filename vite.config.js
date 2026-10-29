@@ -1,4 +1,5 @@
 import { defineConfig } from "vite";
+import { VitePWA } from "vite-plugin-pwa";
 import app from "./app.config.js";
 
 // Where the site is served from. "/" locally and in the native apps; GitHub Pages serves the
@@ -7,6 +8,7 @@ const base = process.env.BASE_PATH ?? "/";
 
 function manifest() {
   return {
+    id: base,   // stable identity for the installed app; keep it unchanged once people install
     name: app.name,
     short_name: app.shortName,
     description: app.description,
@@ -20,6 +22,12 @@ function manifest() {
       { src: `${base}icons/icon-512.png`, sizes: "512x512", type: "image/png", purpose: "any" },
       { src: `${base}icons/icon-maskable-512.png`, sizes: "512x512", type: "image/png", purpose: "maskable" },
       { src: `${base}icons/icon.svg`, sizes: "any", type: "image/svg+xml", purpose: "any" },
+    ],
+    // Shown in the richer install dialog on Android ("narrow") and desktop ("wide").
+    screenshots: [
+      { src: `${base}screenshots/home-narrow.png`, sizes: "780x1688", type: "image/png", form_factor: "narrow", label: "Home: streak, daily puzzle and board sizes" },
+      { src: `${base}screenshots/play-narrow.png`, sizes: "780x1688", type: "image/png", form_factor: "narrow", label: "A Knight's Tour in progress" },
+      { src: `${base}screenshots/play-wide.png`, sizes: "1280x800", type: "image/png", form_factor: "wide", label: "A Knight's Tour in progress" },
     ],
   };
 }
@@ -50,7 +58,23 @@ export default defineConfig({
   base,
   root: "src",
   publicDir: "../public",
-  plugins: [appConfig()],
+  plugins: [
+    appConfig(),
+    // Generates the service worker that precaches the whole build (fonts included) for offline
+    // play. The manifest stays ours (appConfig, from app.config.js); registration and the
+    // update prompt live in src/pwa.js so the native apps can skip them.
+    VitePWA({
+      manifest: false,
+      injectRegister: false,
+      registerType: "prompt",
+      filename: "sw.js",
+      workbox: {
+        globPatterns: ["**/*.{html,js,css,woff2,png,svg,json}"],
+        globIgnores: ["screenshots/**"],   // only used by the install dialog
+        cleanupOutdatedCaches: true,
+      },
+    }),
+  ],
   build: {
     outDir: "../dist",
     emptyOutDir: true,
