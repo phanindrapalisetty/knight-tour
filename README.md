@@ -1,24 +1,76 @@
-# ♞ Knight's Tour Game
+# ♞ Knight Zigg Game
 
-A fun browser-based game that visualizes the classic **Knight's Tour** problem from chess. Built using **FastAPI** for the backend and **HTML/CSS/JS** for the frontend.
+A puzzle game built on the classic **Knight's Tour** problem from chess. It runs entirely in the browser, so one codebase ships as a PWA and, through Capacitor, as Android and iOS apps.
 
 ## Gameplay
 
-Move a knight across the entire chessboard such that it visits every square **exactly once**.
+Move a knight so that it visits every square of the board **exactly once**. Tap any square to place the knight, then follow the green dots. If you get stuck, undo a few moves or restart.
 
-Try to complete the tour without getting stuck!
+Finish a game each day to keep your 🔥 streak going.
 
-## Tech Stack
+## Features
 
-- **FastAPI** – Python backend
-- **HTML/CSS/JavaScript** – Frontend game logic
-- **Uvicorn** – ASGI server
+- Board sizes from 5×5 to 8×8
+- Timed mode with a best time for each size
+- Day streak with a Monday–Sunday week view
+- Stats for each size: best score, best time, games played, tours completed
+- Share a result card as text or an image
+- Five board themes, each in light and dark, plus a System / Light / Dark setting
+- Saves your game and progress on the device; no account or server
 
-## Run Locally
+## Run locally
+
+Requires Node.js 22.12 or later.
 
 ```bash
-# Install dependencies
-pip install -r requirements.txt
+npm install
+npm run dev       # dev server at http://localhost:5173
+npm test          # run the tests
+npm run build     # production build in dist/
+npm run preview   # serve the production build
+```
 
-# Run the FastAPI server
-uvicorn app.main:app --reload
+## Configuration
+
+| File | What it controls |
+|---|---|
+| `app.config.js` | App name, description and brand colors. The page title, the PWA manifest, the screens and the share card all read from here. |
+| `src/features.js` | Feature switches. Hints are built but currently switched off. |
+| `src/theme.js` | Board themes and their light and dark palettes. |
+
+## Project structure
+
+```
+app.config.js       name and brand colors
+vite.config.js      build; generates manifest.json from app.config.js
+public/             icons and service worker, copied as-is
+src/
+  index.html        page shell
+  main.js           app state, navigation, timer, actions
+  game.js           board rules (pure functions)
+  session.js        the game in progress: moves, time, hints, undos
+  streak.js         day streak and week view
+  stats.js          per-size stats
+  settings.js       theme, appearance, board size, timed mode
+  storage.js        saving and loading through Capacitor Preferences
+  theme.js          palettes and light/dark handling
+  screens/          Home, Play, Result and Share screens
+tests/              Vitest tests
+```
+
+Saved data is versioned. When a format changes, older saves upgrade on load instead of being lost.
+
+## Platforms
+
+| Platform | Status |
+|---|---|
+| Web | Runs locally; installable in production builds |
+| PWA offline play | Not yet; see the roadmap |
+| Android | Planned (Capacitor) |
+| iOS | Planned (Capacitor) |
+
+See [ROADMAP.md](ROADMAP.md) for the full checklist.
+
+## Versioning
+
+The project follows [Semantic Versioning](https://semver.org/). The version lives in `package.json`, and each release is tagged `vX.Y.Z` with its notes in [release-notes/](release-notes/), one file per release (for example [v0.1.0.md](release-notes/v0.1.0.md)).

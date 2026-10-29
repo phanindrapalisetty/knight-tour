@@ -173,3 +173,8 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+# Node / Vite
+node_modules/
+.vite/
+
+.claude/
