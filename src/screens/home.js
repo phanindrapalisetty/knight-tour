@@ -1,5 +1,5 @@
 import { SIZES, getStatus } from "../game.js";
-import { THEMES, APPEARANCES, resolveMode } from "../theme.js";
+import { renderMenu } from "./menu.js";
 import { displayedStreak, playedToday, weekView } from "../streak.js";
 import { sizeStats } from "../stats.js";
 import { formatTime, plural } from "../format.js";
@@ -87,44 +87,18 @@ function tourSection(state) {
     </section>`;
 }
 
-// Swatches show each theme in the palette currently in use, so dark mode previews dark boards.
-function themePicker({ theme, appearance }) {
-  const mode = resolveMode(appearance);
-  const options = Object.entries(THEMES).map(([id, t]) => `
-    <button class="theme-btn" data-action="setTheme" data-theme="${id}" aria-pressed="${id === theme}" aria-label="Use ${t.name} theme">
-      <span class="swatch" style="--sw-light:${t[mode].light};--sw-dark:${t[mode].dark}"><span></span><span></span><span></span><span></span></span>
-      <span class="small">${t.name}</span>
-    </button>`).join("");
+// With the menu open, the home content is inert so focus and screen readers stay in the menu.
+export function renderHome(state, { menuOpen = false } = {}) {
   return `
-    <section class="theme-section" aria-label="Board theme">
-      <h2>Board theme</h2>
-      <div class="themes">${options}</div>
-    </section>`;
-}
-
-function appearancePicker(current) {
-  const options = Object.entries(APPEARANCES).map(([id, label]) => `
-    <button class="segment" data-action="setAppearance" data-appearance="${id}" aria-pressed="${id === current}">
-      ${icon.appearance[id]}${label}
-    </button>`).join("");
-  return `
-    <section class="theme-section" aria-label="Appearance">
-      <h2>Appearance</h2>
-      <div class="segmented">${options}</div>
-    </section>`;
-}
-
-export function renderHome(state) {
-  return `
-    <div class="screen home">
+    <div class="screen home" ${menuOpen ? "inert" : ""}>
       <header class="app-header">
         ${icon.logoMark(34)}
         <span class="wordmark">${app.name}</span>
+        <button class="icon-btn menu-btn" data-action="openMenu" aria-label="Menu" aria-haspopup="dialog" aria-controls="menu" aria-expanded="${menuOpen}">${icon.menu}</button>
       </header>
       ${streakCard(state.streak)}
       ${dailyCard()}
       ${tourSection(state)}
-      ${themePicker(state.settings)}
-      ${appearancePicker(state.settings.appearance)}
-    </div>`;
+    </div>
+    ${menuOpen ? renderMenu(state) : ""}`;
 }

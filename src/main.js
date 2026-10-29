@@ -36,6 +36,7 @@ function persist(promise) {
 
 const SCREENS = {
   home: () => renderHome(state),
+  menu: () => renderHome(state, { menuOpen: true }),   // Home with the menu panel over it
   play: () => renderPlay(state, hint),
   result: () => renderResult(state),
   share: () => renderShare(state),
@@ -49,9 +50,30 @@ function currentScreen() {
   return name;
 }
 
+let lastScreen = null;
+
+// Identifies a control across re-renders, e.g. "setTheme|walnut", so focus can be put back.
+const controlKey = el => el && [el.dataset.action, el.dataset.theme, el.dataset.appearance, el.dataset.size, el.dataset.x, el.dataset.y].join("|");
+
 function render({ resetScroll = false } = {}) {
-  root.innerHTML = SCREENS[currentScreen()]();
-  if (resetScroll) window.scrollTo(0, 0);
+  const screen = currentScreen();
+  const focused = controlKey(document.activeElement?.closest("[data-action]"));
+  const menuToggled = (lastScreen === "home" && screen === "menu") || (lastScreen === "menu" && screen === "home");
+
+  root.innerHTML = SCREENS[screen]();
+  // Entrance animations play only when arriving on a screen, not when it redraws in place.
+  root.classList.toggle("settled", screen === lastScreen);
+  document.documentElement.classList.toggle("menu-open", screen === "menu");
+
+  if (menuToggled) {
+    // Opening the menu moves focus into it; closing returns focus to the menu button.
+    root.querySelector(screen === "menu" ? ".menu-close" : ".menu-btn")?.focus();
+  } else if (focused && screen === lastScreen) {
+    [...root.querySelectorAll("[data-action]")].find(el => controlKey(el) === focused)?.focus();
+  }
+  // The menu sits over Home, so opening or closing it keeps the page where it was.
+  if (resetScroll && !menuToggled) window.scrollTo(0, 0);
+  lastScreen = screen;
 }
 
 function navigate(name) {
@@ -143,6 +165,8 @@ const actions = {
     render({ resetScroll: true });
   },
   back: goBack,
+  openMenu: () => navigate("menu"),
+  closeMenu: goBack,
   setSize({ size }) {
     updateSettings({ size: Number(size) });
     render();
@@ -193,6 +217,23 @@ root.addEventListener("click", event => {
   const el = event.target.closest("[data-action]");
   if (!el || el.disabled) return;
   actions[el.dataset.action]?.(el.dataset, el);
+});
+
+root.addEventListener("keydown", event => {
+  if (currentScreen() !== "menu") return;
+  if (event.key === "Escape") actions.closeMenu();
+  // Keep Tab cycling inside the open menu instead of leaving the page.
+  if (event.key === "Tab") {
+    const controls = [...root.querySelectorAll(".drawer button")];
+    const [first, last] = [controls[0], controls.at(-1)];
+    if (event.shiftKey && document.activeElement === first) {
+      last.focus();
+      event.preventDefault();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      first.focus();
+      event.preventDefault();
+    }
+  }
 });
 
 // --- Timer ---------------------------------------------------------------------------------

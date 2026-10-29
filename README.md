@@ -15,7 +15,7 @@ Finish a game each day to keep your 🔥 streak going.
 - Day streak with a Monday–Sunday week view
 - Stats for each size: best score, best time, games played, tours completed
 - Share a result card as text or an image
-- Five board themes, each in light and dark, plus a System / Light / Dark setting
+- Five board themes, each in light and dark, plus a System / Light / Dark setting, in the ☰ menu
 - Saves your game and progress on the device; no account or server
 
 ## Run locally
@@ -54,7 +54,7 @@ src/
   settings.js       theme, appearance, board size, timed mode
   storage.js        saving and loading through Capacitor Preferences
   theme.js          palettes and light/dark handling
-  screens/          Home, Play, Result and Share screens
+  screens/          Home (with its ☰ menu), Play, Result and Share screens
 tests/              Vitest tests
 ```
 
@@ -73,4 +73,9 @@ See [ROADMAP.md](ROADMAP.md) for the full checklist.
 
 ## Versioning
 
-The project follows [Semantic Versioning](https://semver.org/). The version lives in `package.json`, and each release is tagged `vX.Y.Z` with its notes in [release-notes/](release-notes/), one file per release (for example [v0.1.0.md](release-notes/v0.1.0.md)).
+The project follows [Semantic Versioning](https://semver.org/). For each release:
+
+1. Work on a branch named `release/vX.Y.Z`.
+2. Set `version` in `package.json` to `X.Y.Z`.
+3. Add its notes as `release-notes/vX.Y.Z.md` (see [release-notes/](release-notes/)).
+4. Tag the release commit `vX.Y.Z`, then merge into `main`.

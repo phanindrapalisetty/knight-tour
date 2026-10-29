@@ -6,11 +6,21 @@ by Capacitor as Android and iOS apps. Branding lives in `app.config.js`; feature
 
 Legend: `[x]` done · `[ ]` to do · `[~]` built but switched off or partial
 
+## Releases
+
+| Version | Branch | Highlights | Notes |
+|---|---|---|---|
+| v0.2.0 | `release/v0.2.0` | Board theme and appearance moved into a ☰ menu | [v0.2.0](release-notes/v0.2.0.md) |
+| v0.1.0 | `feat/client-app` | Client-only rebuild with the new design | [v0.1.0](release-notes/v0.1.0.md) |
+
 ## Housekeeping
 
 - [x] Commit the work so far (branch `feat/client-app`, tagged `v0.1.0`)
 - [x] Update `README.md` for the new structure; add release notes in `release-notes/`
-- [ ] Merge `feat/client-app` into `main` and push the branch and tag
+- [x] Merge `feat/client-app` into `main` and push the branch and tag (v0.1.0)
+- [x] Name branches after their release: `release/vX.Y.Z`
+- [x] Merge `release/v0.2.0` into `main` and push the branch and tag (v0.2.0)
+- [ ] Delete or rename the merged `feat/client-app` branch
 - [ ] Rename `name` in `package.json` if the app name changes (it's an id, not shown to players)
 
 ## Phase 1: Client-only game
@@ -38,7 +48,7 @@ Legend: `[x]` done · `[ ]` to do · `[~]` built but switched off or partial
 - [x] App name and brand colors in one place (`app.config.js`)
 - [x] App icon: Closed tour, recolored to the Tournament palette; tile-less mark in the Home header
 - [~] Daily puzzle (placeholder card on Home; no puzzle logic yet)
-- [ ] Settings screen (the design shows a button but doesn't define it)
+- [x] Menu (☰) on Home holding board theme and appearance (v0.2.0)
 - [ ] Test on real phones: Android Chrome, iPhone Safari
 
 ## Phase 3: Android app
