@@ -68,7 +68,7 @@ function tourSection(state) {
     <section class="tour-section" aria-label="${app.tourModeName}">
       <div class="section-head">
         <div>
-          <h2>${app.tourModeName}</h2>
+          <h2>Knight's Tour</h2>
           <span class="muted small">The classic: visit every square, any time</span>
         </div>
         <button class="btn btn-ink" data-action="play">${resumable ? "Resume" : "Play"} ${icon.arrowRight(16)}</button>
