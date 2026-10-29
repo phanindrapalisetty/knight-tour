@@ -11,17 +11,33 @@ Legend: `[x]` done · `[ ]` to do · `[~]` built but switched off or partial
 | Version | Branch | Highlights | Notes |
 |---|---|---|---|
 | v0.2.0 | `release/v0.2.0` | Board theme and appearance moved into a ☰ menu | [v0.2.0](release-notes/v0.2.0.md) |
-| v0.1.0 | `feat/client-app` | Client-only rebuild with the new design | [v0.1.0](release-notes/v0.1.0.md) |
+| v0.1.0 | `release/v0.1.0` | Client-only rebuild with the new design | [v0.1.0](release-notes/v0.1.0.md) |
 
 ## Housekeeping
 
-- [x] Commit the work so far (branch `feat/client-app`, tagged `v0.1.0`)
+- [x] Commit the work so far (branch `release/v0.1.0`, tagged `v0.1.0`)
 - [x] Update `README.md` for the new structure; add release notes in `release-notes/`
-- [x] Merge `feat/client-app` into `main` and push the branch and tag (v0.1.0)
+- [x] Merge `release/v0.1.0` into `main` and push the branch and tag (v0.1.0)
 - [x] Name branches after their release: `release/vX.Y.Z`
 - [x] Merge `release/v0.2.0` into `main` and push the branch and tag (v0.2.0)
-- [ ] Delete or rename the merged `feat/client-app` branch
+- [x] Rename the first release branch from `feat/client-app` to `release/v0.1.0`
 - [ ] Rename `name` in `package.json` if the app name changes (it's an id, not shown to players)
+
+### CI/CD (GitHub Actions)
+
+CI
+- [ ] Run tests and the build on every push and pull request
+- [ ] Use the Node version from `package.json` (`engines`) and cache npm installs
+
+Release checks (on `release/v*` branches and `v*` tags)
+- [ ] `package.json` version matches the branch or tag
+- [ ] `release-notes/vX.Y.Z.md` exists for that version
+
+CD
+- [ ] On a `v*` tag, create a GitHub Release using `release-notes/vX.Y.Z.md` as its description
+- [ ] On a `v*` tag, deploy the web build to the static host (see Phase 4)
+- [ ] Android build in CI (signed AAB as a release asset), once Phase 3 is in place
+- [ ] iOS build in CI (TestFlight upload, needs a macOS runner), once Phase 5 is in place
 
 ## Phase 1: Client-only game
 
@@ -48,7 +64,7 @@ Legend: `[x]` done · `[ ]` to do · `[~]` built but switched off or partial
 - [x] App name and brand colors in one place (`app.config.js`)
 - [x] App icon: Closed tour, recolored to the Tournament palette; tile-less mark in the Home header
 - [~] Daily puzzle (placeholder card on Home; no puzzle logic yet)
-- [x] Menu (☰) on Home holding board theme and appearance (v0.2.0)
+- [x] Menu (☰) on Home holding board theme and appearance (v0.2.0) 
 - [ ] Test on real phones: Android Chrome, iPhone Safari
 
 ## Phase 3: Android app
@@ -102,5 +118,4 @@ To do
 
 - [ ] Daily puzzle logic (fixed start, blocked squares, difficulty rising Monday to Sunday)
 - [ ] Streak reminder notifications in the apps (`@capacitor/local-notifications`)
-- [ ] CI on GitHub Actions: tests, web deploy and Android build on each tag
 - [ ] Live updates for the apps (Capgo or Capawesome), only if store review delays become a problem
