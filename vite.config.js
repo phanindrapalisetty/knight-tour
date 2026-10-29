@@ -1,20 +1,25 @@
 import { defineConfig } from "vite";
 import app from "./app.config.js";
 
+// Where the site is served from. "/" locally and in the native apps; GitHub Pages serves the
+// project at /<repo>/, so its workflow builds with BASE_PATH=/knight-tour/. Must start and end with "/".
+const base = process.env.BASE_PATH ?? "/";
+
 function manifest() {
   return {
     name: app.name,
     short_name: app.shortName,
     description: app.description,
-    start_url: "/",
+    start_url: base,
+    scope: base,
     display: "standalone",
     background_color: app.backgroundColor,
     theme_color: app.themeColor,
     icons: [
-      { src: "/icons/icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },
-      { src: "/icons/icon-512.png", sizes: "512x512", type: "image/png", purpose: "any" },
-      { src: "/icons/icon-maskable-512.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
-      { src: "/icons/icon.svg", sizes: "any", type: "image/svg+xml", purpose: "any" },
+      { src: `${base}icons/icon-192.png`, sizes: "192x192", type: "image/png", purpose: "any" },
+      { src: `${base}icons/icon-512.png`, sizes: "512x512", type: "image/png", purpose: "any" },
+      { src: `${base}icons/icon-maskable-512.png`, sizes: "512x512", type: "image/png", purpose: "maskable" },
+      { src: `${base}icons/icon.svg`, sizes: "any", type: "image/svg+xml", purpose: "any" },
     ],
   };
 }
@@ -30,7 +35,7 @@ function appConfig() {
     name: "app-config",
     transformIndexHtml: html => Object.entries(vars).reduce((out, [key, value]) => out.replaceAll(key, value), html),
     configureServer(server) {
-      server.middlewares.use("/manifest.json", (_, res) => {
+      server.middlewares.use(`${base}manifest.json`, (_, res) => {
         res.setHeader("Content-Type", "application/manifest+json");
         res.end(JSON.stringify(manifest(), null, 2));
       });
@@ -42,6 +47,7 @@ function appConfig() {
 }
 
 export default defineConfig({
+  base,
   root: "src",
   publicDir: "../public",
   plugins: [appConfig()],

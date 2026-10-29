@@ -12,7 +12,9 @@ const version = match[1];
 const pkg = JSON.parse(readFileSync("package.json", "utf8"));
 const errors = [];
 if (pkg.version !== version) errors.push(`package.json has ${pkg.version}, expected ${version}`);
-if (!existsSync(`release-notes/v${version}.md`)) errors.push(`release-notes/v${version}.md is missing`);
+const notes = `release-notes/v${version}.md`;
+if (!existsSync(notes)) errors.push(`${notes} is missing`);
+else if (!readFileSync(notes, "utf8").trim()) errors.push(`${notes} is empty`);
 
 for (const e of errors) console.error(`::error::${e}`);   // shows as a red annotation in GitHub
 process.exit(errors.length ? 1 : 0);

@@ -1,5 +1,9 @@
 # ♞ Knight Zigg Game
 
+[![CI](https://github.com/phanindrapalisetty/knight-tour/actions/workflows/ci.yml/badge.svg)](https://github.com/phanindrapalisetty/knight-tour/actions/workflows/ci.yml)
+
+**Play it:** https://phanindrapalisetty.github.io/knight-tour/
+
 A puzzle game built on the classic **Knight's Tour** problem from chess. It runs entirely in the browser, so one codebase ships as a PWA and, through Capacitor, as Android and iOS apps.
 
 ## Gameplay
@@ -64,7 +68,7 @@ Saved data is versioned. When a format changes, older saves upgrade on load inst
 
 | Platform | Status |
 |---|---|
-| Web | Runs locally; installable in production builds |
+| Web | Live on [GitHub Pages](https://phanindrapalisetty.github.io/knight-tour/); installable |
 | PWA offline play | Not yet; see the roadmap |
 | Android | Planned (Capacitor) |
 | iOS | Planned (Capacitor) |
@@ -78,4 +82,15 @@ The project follows [Semantic Versioning](https://semver.org/). For each release
 1. Work on a branch named `release/vX.Y.Z`.
 2. Set `version` in `package.json` to `X.Y.Z`.
 3. Add its notes as `release-notes/vX.Y.Z.md` (see [release-notes/](release-notes/)).
-4. Tag the release commit `vX.Y.Z`, then merge into `main`.
+4. Push the branch and wait for CI to pass.
+5. Tag the release commit `vX.Y.Z` and push the tag. The Release workflow checks it, creates the GitHub Release from the notes, and deploys to GitHub Pages.
+6. Fast-forward `main` to the release and push. The `main` ruleset only accepts commits that already passed the `tests` check.
+
+## CI/CD
+
+| Workflow | Runs on | Does |
+|---|---|---|
+| [`ci.yml`](.github/workflows/ci.yml) | Pushes to `main` and `release/**`, pull requests | Tests, build, release checks ([`scripts/check-release.mjs`](scripts/check-release.mjs)) |
+| [`release.yml`](.github/workflows/release.yml) | `v*.*.*` tags (or manually) | Tests and release checks, GitHub Release, GitHub Pages deploy |
+
+The Pages build sets `BASE_PATH=/knight-tour/` because Pages serves the site under the repository name. Local and native builds use `/`.

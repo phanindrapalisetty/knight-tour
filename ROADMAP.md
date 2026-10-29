@@ -10,6 +10,7 @@ Legend: `[x]` done · `[ ]` to do · `[~]` built but switched off or partial
 
 | Version | Branch | Highlights | Notes |
 |---|---|---|---|
+| v0.3.0 | `release/v0.3.0` | CI/CD: tests on every push, release checks, GitHub Releases, GitHub Pages deploy | [v0.3.0](release-notes/v0.3.0.md) |
 | v0.2.0 | `release/v0.2.0` | Board theme and appearance moved into a ☰ menu | [v0.2.0](release-notes/v0.2.0.md) |
 | v0.1.0 | `release/v0.1.0` | Client-only rebuild with the new design | [v0.1.0](release-notes/v0.1.0.md) |
 
@@ -26,16 +27,17 @@ Legend: `[x]` done · `[ ]` to do · `[~]` built but switched off or partial
 ### CI/CD (GitHub Actions)
 
 CI
-- [ ] Run tests and the build on every push and pull request
-- [ ] Use the Node version from `package.json` (`engines`) and cache npm installs
+- [x] Run tests and the build on every push and pull request (`.github/workflows/ci.yml`)
+- [x] Use the Node version from `package.json` (`engines`) and cache npm installs
+- [x] `main` ruleset: required `tests` check, linear history, no deletions or force pushes
 
 Release checks (on `release/v*` branches and `v*` tags)
-- [ ] `package.json` version matches the branch or tag
-- [ ] `release-notes/vX.Y.Z.md` exists for that version
+- [x] `package.json` version matches the branch or tag (`scripts/check-release.mjs`)
+- [x] `release-notes/vX.Y.Z.md` exists for that version and isn't empty
 
 CD
-- [ ] On a `v*` tag, create a GitHub Release using `release-notes/vX.Y.Z.md` as its description
-- [ ] On a `v*` tag, deploy the web build to the static host (see Phase 4)
+- [x] On a `v*` tag, create a GitHub Release using `release-notes/vX.Y.Z.md` as its description (`.github/workflows/release.yml`)
+- [x] On a `v*` tag, deploy the web build to GitHub Pages (built with `BASE_PATH=/knight-tour/`)
 - [ ] Android build in CI (signed AAB as a release asset), once Phase 3 is in place
 - [ ] iOS build in CI (TestFlight upload, needs a macOS runner), once Phase 5 is in place
 
@@ -103,7 +105,7 @@ To do
 - [ ] Update flow: "New version available" prompt that reloads into the new version
 - [ ] Manifest `id` and install screenshots (richer install dialog on Android)
 - [ ] Verify offline in DevTools and pass the installability checks
-- [ ] Deploy over HTTPS to a static host (GitHub Pages, Netlify or Cloudflare Pages)
+- [x] Deploy over HTTPS to GitHub Pages on each `v*` tag: https://phanindrapalisetty.github.io/knight-tour/ (v0.3.0)
 
 ## Phase 5: iOS app
 
